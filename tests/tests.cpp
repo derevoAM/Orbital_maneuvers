@@ -49,6 +49,18 @@ TEST(ORBITAL_MANEUVERS, HOHMANN_TRANSFER) {
 
 }
 
+TEST(ORBITAL_MANEUVERS, BI_ELLIPTIC_TRANSFER) {
+    COE<double> elem1;
+    elem1.a = 191.3441 + 6378.137;
+    COE<double> elem2;
+    elem2.a = 376310 + 6378.137;
+    elem1.mu = 398600.4415;
+    elem2.mu = 398600.4415;
+    double r_b = 503873 + 6378.137;
+    double delta_v = Bi_elliptic_transfer(elem1, elem2, r_b);
+    ASSERT_NEAR(delta_v, 3.904057, 1e-6);
+
+}
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
