@@ -49,7 +49,7 @@ TEST(ORBITAL_MANEUVERS, HOHMANN_TRANSFER) {
 
 }
 
-TEST(ORBITAL_MANEUVERS, BI_ELLIPTIC_TRANSFER) {
+TEST(ORBITAL_MANEUVERS, BI_ELLIPTIC_TRANSFER_CIRCULAR_ORBITS) {
     COE<double> elem1;
     elem1.a = 191.3441 + 6378.137;
     COE<double> elem2;
@@ -57,10 +57,38 @@ TEST(ORBITAL_MANEUVERS, BI_ELLIPTIC_TRANSFER) {
     elem1.mu = 398600.4415;
     elem2.mu = 398600.4415;
     double r_b = 503873 + 6378.137;
-    double delta_v = Bi_elliptic_transfer(elem1, elem2, r_b);
+    double delta_v = Bi_elliptic_transfer_circular_orbits(elem1, elem2, r_b);
     ASSERT_NEAR(delta_v, 3.904057, 1e-6);
 
 }
+
+TEST(ORBITAL_MANEUVERS, BI_ELLIPTIC_TRANSFER_ELLIPTIC_ORBITS) {
+    COE<double> elem1;
+    elem1.nu = 10 * M_PI / 180;
+    elem1.e = 0.2;
+    elem1.p = 10320 * (1 - elem1.e);
+    elem1.a = 10320 / (1 + elem1.e);
+    elem1.i = 0;
+    elem1.flag = 3;
+    elem1.w_true = M_PI / 2;
+    elem1.mu = 398600.4415;
+
+    COE<double> elem2;
+    elem2.nu = 50 * M_PI / 180;
+    elem2.e = 0.2;
+    elem2.p = 10320 * 18.98 * (1 - elem2.e);
+    elem2.a = 10320 * 18.98 / (1 + elem2.e);
+    elem2.i = 0;
+    elem2.flag = 3;
+    elem2.w_true = 35 * M_PI / 180;
+    elem2.mu = 398600.4415;
+    auto[r, v] = COE2RV(elem2);
+    std::cout << norm(r) << "\n";
+    double  delta_v = Bi_elliptic_transfer_elliptic_orbits(elem1, elem2, 10320* 18.98);
+    std::cout << delta_v;
+}
+
+
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);

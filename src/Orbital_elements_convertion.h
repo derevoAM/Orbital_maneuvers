@@ -116,7 +116,7 @@ std::pair<std::vector<T>, std::vector<T>> COE2RV(const COE<T> &elem) {
         W = elem.W;
     }
     std::vector<T> r_pqw{elem.p * cos(nu) / (1 + elem.e * cos(nu)), elem.p * sin(nu) / (1 + elem.e * cos(nu)), 0};
-    std::vector<T> v_pqw{-std::sqrt(elem.mu / elem.p) * sin(nu), std::sqrt(elem.mu / elem.p) * (elem.e + cos(nu))};
+    std::vector<T> v_pqw{-std::sqrt(elem.mu / elem.p) * sin(nu), std::sqrt(elem.mu / elem.p) * (elem.e + cos(nu)), 0};
     Dense<T> A(3, 3, {cos(W) * cos(w) - sin(W) * sin(w) * cos(i), -cos(W) * sin(w) - sin(W) * cos(w) * cos(i), sin(W) * sin(i),
                       sin(W) * cos(w) + cos(W) * sin(w) * cos(i), -sin(W) * sin(w) + cos(W) * cos(w) * cos(i), -cos(W) * sin(i),
                       sin(w) * sin(i),                             cos(w) * sin(i),                             cos(i)});

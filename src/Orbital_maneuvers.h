@@ -4,8 +4,7 @@
 #include "Orbital_elements_convertion.h"
 
 template<typename T>
-T Hohmann_transfer(const COE<T> &initial, const COE<T> &final)
-{
+T Hohmann_transfer(const COE<T> &initial, const COE<T> &final) {
     T mu = initial.mu;
     T a_trans = (initial.a + final.a) / 2;
     T v_in = std::sqrt(mu / initial.a);
@@ -18,8 +17,7 @@ T Hohmann_transfer(const COE<T> &initial, const COE<T> &final)
 }
 
 template<typename T>
-T Bi_elliptic_transfer(const COE<T> &initial, const COE<T> &final, T r_b)
-{
+T Bi_elliptic_transfer_circular_orbits(const COE<T> &initial, const COE<T> &final, T r_b) {
     T mu = initial.mu;
     T a_trans1 = (initial.a + r_b) / 2;
     T a_trans2 = (final.a + r_b) / 2;
@@ -35,5 +33,34 @@ T Bi_elliptic_transfer(const COE<T> &initial, const COE<T> &final, T r_b)
     return delta_v;
 
 }
+
+template<typename T>
+T Bi_elliptic_transfer_elliptic_orbits(const COE<T> &initial, const COE<T> &final, T r_a) {
+    auto [r1, v1] = COE2RV(initial);
+    auto [r2, v2] = COE2RV(final);
+    T mu = initial.mu;
+
+    T p1h = 2 * norm(r1) * r_a / (norm(r1) + r_a);
+    T v1h = std::sqrt(mu * p1h) / norm(r1);
+
+    T p2h = 2 * norm(r2) * r_a / (norm(r2) + r_a);
+    T v2h = std::sqrt(mu * p2h) / norm(r2);
+
+    T v0r = scalar(v1, r1) / norm(r1);
+    T v0t = std::sqrt(scalar(v1, v1) - v0r * v0r);
+
+    T v3r = scalar(v2, r2) / norm(r2);
+    T v3t = std::sqrt(scalar(v2, v2) - v3r * v3r);
+
+    T v1ha = std::sqrt(mu * p1h) / r_a;
+    T v2ha = std::sqrt(mu * p2h) / r_a;
+
+    T delta_v = v1h + v2h - std::sqrt(v0r * v0r + (v0t + v1ha) * (v0t + v1ha)) -
+                std::sqrt(v3r * v3r + (v3t - v2ha) * (v3t - v2ha));
+    return delta_v;
+
+
+}
+
 
 #endif //ORBITAL_MANEUVERS_ORBITAL_MANEUVERS_H
