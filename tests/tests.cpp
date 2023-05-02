@@ -27,7 +27,7 @@ TEST(ORBITAL_MANEUVERS, COE2RV_ELLIPTIC_INCLINED) {
     elem.nu = 92.335 * M_PI / 180;
     elem.flag = 4;
     elem.mu = 398600.4415;
-    auto[r, v] = COE2RV(elem);
+    auto [r, v] = COE2RV(elem);
     ASSERT_NEAR(r[0], 6525.344, 1);
     ASSERT_NEAR(r[1], 6861.535, 1);
     ASSERT_NEAR(r[2], 6449.125, 1);
@@ -62,7 +62,7 @@ TEST(ORBITAL_MANEUVERS, BI_ELLIPTIC_TRANSFER_CIRCULAR_ORBITS) {
 
 }
 
-TEST(ORBITAL_MANEUVERS, BI_ELLIPTIC_TRANSFER_ELLIPTIC_ORBITS) {
+TEST(ORBITAL_MANEUVERS, BI_ELLIPTIC_TRANSFER_BOUNDARY_CONDITION_EXAMPLE_1) {
     COE<double> elem1;
     elem1.nu = 10 * M_PI / 180;
     elem1.e = 0.2;
@@ -82,14 +82,11 @@ TEST(ORBITAL_MANEUVERS, BI_ELLIPTIC_TRANSFER_ELLIPTIC_ORBITS) {
     elem2.flag = 3;
     elem2.w_true = 35 * M_PI / 180;
     elem2.mu = 398600.4415;
-    auto[r, v] = COE2RV(elem2);
-    std::cout << norm(r) << "\n";
-    double  delta_v = Bi_elliptic_transfer_elliptic_orbits(elem1, elem2, 2 * 10320 * 13.43);
-    std::cout << delta_v << "\n";
+    double delta_v = Bi_elliptic_transfer_elliptic_orbits(elem1, elem2, 10320 * 13.43);
+    ASSERT_NEAR(delta_v, 3.16723, 1e-5);
 }
 
-
-TEST(ORBITAL_MANEUVERS, TWO_IMPULSE_TRANSFER_ELLIPTIC_ORBITS) {
+TEST(ORBITAL_MANEUVERS, BI_ELLIPTIC_TRANSFER_GENERAL_EXAMPLE_1) {
     COE<double> elem1;
     elem1.nu = 10 * M_PI / 180;
     elem1.e = 0.2;
@@ -107,12 +104,112 @@ TEST(ORBITAL_MANEUVERS, TWO_IMPULSE_TRANSFER_ELLIPTIC_ORBITS) {
     elem2.a = 10320 * 13.43 / (1 + elem2.e);
     elem2.i = 0;
     elem2.flag = 3;
-    elem2.w_true = 95 * M_PI / 180;
+    elem2.w_true = 35 * M_PI / 180;
     elem2.mu = 398600.4415;
-//    auto[r, v] = COE2RV(elem2);
-//    std::cout << norm(r) << "\n";
-    double  delta_v = Two_impulse_transfer_elliptic_orbits(elem1, elem2);
-    std::cout << delta_v;
+    double delta_v = Bi_elliptic_transfer_elliptic_orbits(elem1, elem2, 2 * 10320 * 13.43);
+    ASSERT_NEAR(delta_v, 3.15139, 1e-4);
+}
+
+TEST(ORBITAL_MANEUVERS, TWO_IMPULSE_TRANSFER_EXAMPLE_1) {
+    COE<double> elem1;
+    elem1.nu = 10 * M_PI / 180;
+    elem1.e = 0.2;
+    elem1.p = 10320 * (1 - elem1.e);
+    elem1.a = 10320 / (1 + elem1.e);
+    elem1.i = 0;
+    elem1.flag = 3;
+    elem1.w_true = M_PI / 2;
+    elem1.mu = 398600.4415;
+
+    COE<double> elem2;
+    elem2.nu = 0 * M_PI / 180;
+    elem2.e = 0.2;
+    elem2.p = 10320 * 13.43 * (1 - elem2.e);
+    elem2.a = 10320 * 13.43 / (1 + elem2.e);
+    elem2.i = 0;
+    elem2.flag = 3;
+    elem2.w_true = 35 * M_PI / 180;
+    elem2.mu = 398600.4415;
+    double delta_v = Two_impulse_transfer_elliptic_orbits(elem1, elem2);
+    ASSERT_NEAR(delta_v, 3.55158, 1e-4);
+}
+
+TEST(ORBITAL_MANEUVERS, BI_ELLIPTIC_TRANSFER_BOUNDARY_CONDITION_EXAMPLE_2) {
+    COE<double> elem1;
+    elem1.nu = 10 * M_PI / 180;
+    elem1.e = 0.2;
+    elem1.p = 10320 * (1 - elem1.e);
+    elem1.a = 10320 / (1 + elem1.e);
+    elem1.i = 30 * M_PI / 180;
+    elem1.flag = 4;
+    elem1.w = 15 * M_PI / 180;
+    elem1.W = 45 * M_PI / 180;
+    elem1.mu = 398600.4415;
+
+    COE<double> elem2;
+    elem2.nu = 50 * M_PI / 180;
+    elem2.e = 0.2;
+    elem2.p = 10320 * 18.98 * (1 - elem1.e);
+    elem2.a = 10320 * 18.98 / (1 + elem1.e);
+    elem2.i = 30 * M_PI / 180;
+    elem2.flag = 4;
+    elem2.w = 15 * M_PI / 180;
+    elem2.W = 45 * M_PI / 180;
+    elem2.mu = 398600.4415;
+    double delta_v = Bi_elliptic_transfer_elliptic_orbits(elem1, elem2, 10320 * 18.98);
+    ASSERT_NEAR(delta_v, 3.14986, 1e-4);
+}
+
+TEST(ORBITAL_MANEUVERS, BI_ELLIPTIC_TRANSFER_GENERAL_EXAMPLE_2) {
+    COE<double> elem1;
+    elem1.nu = 10 * M_PI / 180;
+    elem1.e = 0.2;
+    elem1.p = 10320 * (1 - elem1.e);
+    elem1.a = 10320 / (1 + elem1.e);
+    elem1.i = 30 * M_PI / 180;
+    elem1.flag = 4;
+    elem1.w = 15 * M_PI / 180;
+    elem1.W = 45 * M_PI / 180;
+    elem1.mu = 398600.4415;
+
+    COE<double> elem2;
+    elem2.nu = 50 * M_PI / 180;
+    elem2.e = 0.2;
+    elem2.p = 10320 * 18.98 * (1 - elem1.e);
+    elem2.a = 10320 * 18.98 / (1 + elem1.e);
+    elem2.i = 30 * M_PI / 180;
+    elem2.flag = 4;
+    elem2.w = 15 * M_PI / 180;
+    elem2.W = 45 * M_PI / 180;
+    elem2.mu = 398600.4415;
+    double delta_v = Bi_elliptic_transfer_elliptic_orbits(elem1, elem2, 2 * 10320 * 18.98);
+    ASSERT_NEAR(delta_v, 3.11046, 1e-4);
+}
+
+TEST(ORBITAL_MANEUVERS, TWO_IMPULSE_TRANSFER_EXAMPLE_2) {
+    COE<double> elem1;
+    elem1.nu = 10 * M_PI / 180;
+    elem1.e = 0.2;
+    elem1.p = 10320 * (1 - elem1.e);
+    elem1.a = 10320 / (1 + elem1.e);
+    elem1.i = 30 * M_PI / 180;
+    elem1.flag = 4;
+    elem1.w = 15 * M_PI / 180;
+    elem1.W = 45 * M_PI / 180;
+    elem1.mu = 398600.4415;
+
+    COE<double> elem2;
+    elem2.nu = 50 * M_PI / 180;
+    elem2.e = 0.2;
+    elem2.p = 10320 * 18.98 * (1 - elem1.e);
+    elem2.a = 10320 * 18.98 / (1 + elem1.e);
+    elem2.i = 30 * M_PI / 180;
+    elem2.flag = 4;
+    elem2.w = 15 * M_PI / 180;
+    elem2.W = 45 * M_PI / 180;
+    elem2.mu = 398600.4415;
+    double delta_v = Two_impulse_transfer_elliptic_orbits(elem1, elem2);
+    ASSERT_NEAR(delta_v, 3.45414, 1e-4);
 }
 
 

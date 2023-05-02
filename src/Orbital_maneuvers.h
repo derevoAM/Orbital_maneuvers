@@ -56,10 +56,9 @@ T Bi_elliptic_transfer_elliptic_orbits(const COE<T> &initial, const COE<T> &fina
     T v1ha = std::sqrt(mu * p1h) / r_a;
     T v2ha = std::sqrt(mu * p2h) / r_a;
 
-    std::cout << v3r << " " << v3t << "\n";
-
     T delta_v = v1h + v2h - std::sqrt(v0r * v0r + (v0t + v1ha) * (v0t + v1ha)) -
                 std::sqrt(v3r * v3r + (v3t - v2ha) * (v3t - v2ha));
+    //std::cout << v3r << " " << v3t << "\n";
     return delta_v;
 
 }
@@ -79,11 +78,12 @@ T Two_impulse_transfer_elliptic_orbits(const COE<T> &initial, const COE<T> &fina
 
     T v3r = scalar(v2, r2) / norm(r2);
     T v3t = std::sqrt(scalar(v2, v2) - v3r * v3r);
-    std::cout << v3r << " " << v3t << " " << norm(r2) << "\n";
+    //std::cout << v3r << " " << v3t << " " << norm(r2) << "\n";
 
     T delta_v = std::sqrt(v3r * v3r + (v3t + v1ht) * (v3t + v1ht)) - std::sqrt(v0r * v0r + (v0t + v2ht) * (v0t + v2ht));
     return delta_v;
 }
+
 
 
 #endif //ORBITAL_MANEUVERS_ORBITAL_MANEUVERS_H
