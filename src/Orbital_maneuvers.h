@@ -52,14 +52,37 @@ T Bi_elliptic_transfer_elliptic_orbits(const COE<T> &initial, const COE<T> &fina
     T v3r = scalar(v2, r2) / norm(r2);
     T v3t = std::sqrt(scalar(v2, v2) - v3r * v3r);
 
+
     T v1ha = std::sqrt(mu * p1h) / r_a;
     T v2ha = std::sqrt(mu * p2h) / r_a;
+
+    std::cout << v3r << " " << v3t << "\n";
 
     T delta_v = v1h + v2h - std::sqrt(v0r * v0r + (v0t + v1ha) * (v0t + v1ha)) -
                 std::sqrt(v3r * v3r + (v3t - v2ha) * (v3t - v2ha));
     return delta_v;
 
+}
 
+template<typename T>
+T Two_impulse_transfer_elliptic_orbits(const COE<T> &initial, const COE<T> &final) {
+    auto [r1, v1] = COE2RV(initial);
+    auto [r2, v2] = COE2RV(final);
+    T mu = initial.mu;
+
+    T p_h = 2 * norm(r1) * norm(r2) / (norm(r1) + norm(r2));
+    T v1ht = std::sqrt(mu * p_h) / norm(r1);
+    T v2ht = std::sqrt(mu * p_h) / norm(r2);
+
+    T v0r = scalar(v1, r1) / norm(r1);
+    T v0t = std::sqrt(scalar(v1, v1) - v0r * v0r);
+
+    T v3r = scalar(v2, r2) / norm(r2);
+    T v3t = std::sqrt(scalar(v2, v2) - v3r * v3r);
+    std::cout << v3r << " " << v3t << " " << norm(r2) << "\n";
+
+    T delta_v = std::sqrt(v3r * v3r + (v3t + v1ht) * (v3t + v1ht)) - std::sqrt(v0r * v0r + (v0t + v2ht) * (v0t + v2ht));
+    return delta_v;
 }
 
 
