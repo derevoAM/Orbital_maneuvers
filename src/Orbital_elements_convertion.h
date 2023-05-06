@@ -120,6 +120,7 @@ std::pair<std::vector<T>, std::vector<T>> COE2RV(const COE<T> &elem) {
     Dense<T> A(3, 3, {cos(W) * cos(w) - sin(W) * sin(w) * cos(i), -cos(W) * sin(w) - sin(W) * cos(w) * cos(i), sin(W) * sin(i),
                       sin(W) * cos(w) + cos(W) * sin(w) * cos(i), -sin(W) * sin(w) + cos(W) * cos(w) * cos(i), -cos(W) * sin(i),
                       sin(w) * sin(i),                             cos(w) * sin(i),                             cos(i)});
+    //std::cout << r_pqw << "\n";
     return std::pair(A * r_pqw, A * v_pqw);
 }
 

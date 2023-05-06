@@ -38,6 +38,7 @@ template<typename T>
 T Bi_elliptic_transfer_elliptic_orbits(const COE<T> &initial, const COE<T> &final, T r_a) {
     auto [r1, v1] = COE2RV(initial);
     auto [r2, v2] = COE2RV(final);
+    //std::cout << r2 << "\n";
     T mu = initial.mu;
 
     T p1h = 2 * norm(r1) * r_a / (norm(r1) + r_a);
@@ -84,6 +85,92 @@ T Two_impulse_transfer_elliptic_orbits(const COE<T> &initial, const COE<T> &fina
     return delta_v;
 }
 
+template<typename T>
+T Inclination_only_transfer(const COE<T> &initial, const COE<T> &final) {
+    T r1 = initial.p / (1 + initial.e * cos(2 * M_PI - initial.w));
+    T r2 = initial.p / (1 + initial.e * cos(M_PI - initial.w));
+
+    T v1 = std::sqrt(2 * initial.mu / r1 - initial.mu / initial.a);
+    T v2 = std::sqrt(2 * initial.mu / r2 - initial.mu / initial.a);
+
+    T fi1 = atan(initial.e * sin(2 * M_PI - initial.w) / (1 + initial.e * cos(2 * M_PI - initial.w)));
+    T fi2 = atan(initial.e * sin(M_PI - initial.w) / (1 + initial.e * cos(M_PI - initial.w)));
+
+    T delta_v1 = 2 * v1 * cos(fi1) * sin(abs(initial.i - final.i) / 2);
+    T delta_v2 = 2 * v2 * cos(fi2) * sin(abs(initial.i - final.i) / 2);
+    return std::min(delta_v1, delta_v2);
+}
+
+template<typename T>
+std::tuple<T, std::vector<T>, std::vector<T>> General_plane_change(COE<T> &initial, const COE<T> &final) {
+    auto [r_i, v_i] = COE2RV(initial);
+    auto [r_f, v_f] = COE2RV(final);
+    T mu = initial.mu;
+    T delta_v1, delta_v2;
+
+    // finding normal vectors
+    std::vector<T> h1 = cross_product(r_i, v_i); // coordinates are A, B, C of plane equation
+    h1 = h1 / norm(h1);
+
+    std::vector<T> h2 = cross_product(r_f, v_f);
+    h2 = h2 / norm(h2);
+
+    std::vector<T> a = cross_product(h1, h2); // vector of plane intersection
+    a = a / norm(a);
+    std::cout << "a= " << a << "\n";
+
+    std::vector<T> e = (r_i * (scalar(v_i, v_i) - mu / norm(r_i)) - v_i * scalar(r_i, v_i)) / mu;
+    //std::cout << e << "\n";
+
+
+    T nu = acos(scalar(e, a) / (norm(e) * norm(a)));
+    if (scalar(a, v_i) < 0) nu = 2 * M_PI - nu;
+
+    std::cout << "nu = " << nu * 180 / M_PI << "\n";
+
+    initial.nu = nu;
+    std::vector<T> v2_1, v2_2; //two vectors for 2 nodes
+
+    // 1 node of intersecting planes
+    auto [r11, v11] = COE2RV(initial);
+    T alpha = acos(scalar(h1, h2));
+    delta_v1 = std::sqrt(2 * scalar(v11, v11) * (1 - cos(alpha)));
+
+    std::cout << v11 << "\n";
+    if (scalar(h1, h2) >= 1e-5) {
+        v2_1 = v11 * cos(alpha) + h1 * norm(v11) * sin(alpha);
+        std::cout << v2_1 << "\n";
+        if (scalar(h2, v2_1) / norm(v2_1) > 1e-1) v2_1 = v11 * cos(alpha) - h1 * norm(v11) * sin(alpha);
+        std::cout << v2_1 << "\n";
+    } else {
+        v2_1 = v11 * (-cos(alpha)) + h1 * norm(v11) * sin(M_PI - alpha);
+        if (scalar(h2, v2_1) / norm(v2_1) > 1e-1) v2_1 = v11 * (-cos(alpha)) - h1 * norm(v11) * sin(M_PI - alpha);
+    }
+    std::cout << "v2=v1 " << norm(v2_1) / norm(v11) << "\n";
+
+    // 2 node of intersecting planes
+    if (nu < M_PI) initial.nu = nu + M_PI;
+    else initial.nu = nu - M_PI;
+
+    std::cout << "nu = " << initial.nu * 180 / M_PI << "\n";
+
+    auto [r12, v12] = COE2RV(initial);
+    delta_v2 = std::sqrt(2 * scalar(v12, v12) * (1 - cos(alpha)));
+
+    if (scalar(h1, h2) >= 1e-30) {
+        v2_2 = v12 * cos(alpha) + h2 * norm(v12) * sin(alpha);
+        if (scalar(h2, v2_2) > 1e-30) v2_2 = v12 * cos(alpha) - h2 * norm(v12) * sin(alpha);
+    } else {
+        v2_2 = v12 * (-cos(alpha)) + h1 * norm(v12) * sin(M_PI - alpha);
+        if (scalar(h2, v2_2) > 1e-30) v2_2 = v12 * (-cos(alpha)) - h1 * norm(v12) * sin(M_PI - alpha);
+    }
+    std::cout << v12 << "\n";
+    //std::cout << r11 << "\n" << r12 << "\n";
+
+    std::cout << delta_v1 << " " << delta_v2 << "\n";
+    if (delta_v1 < delta_v2) return {delta_v1, r11, v2_1};
+    else return {delta_v2, r12, v2_2};
+}
 
 
 #endif //ORBITAL_MANEUVERS_ORBITAL_MANEUVERS_H

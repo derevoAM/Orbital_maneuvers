@@ -212,6 +212,82 @@ TEST(ORBITAL_MANEUVERS, TWO_IMPULSE_TRANSFER_EXAMPLE_2) {
     ASSERT_NEAR(delta_v, 3.45414, 1e-4);
 }
 
+TEST(ORBITAL_MANEUVERS, BI_ELLIPTIC_TRANSFER_CIRCULAR_ORBITS_GENERAL) {
+    COE<double> elem1;
+    elem1.a = 191.3441 + 6378.137;
+    elem1.p = elem1.a;
+    COE<double> elem2;
+    elem2.a = 376310 + 6378.137;
+    elem2.p = elem2.a;
+    elem1.mu = 398600.4415;
+    elem2.mu = 398600.4415;
+
+    elem1.flag = 1;
+    elem2.flag = 1;
+    elem1.i = 0;
+    elem2.i = 0;
+    elem1.lam_true = 10 * M_PI / 180;
+    elem2.lam_true = 10 * M_PI / 180;
+    double r_b = 503873 + 6378.137;
+    double delta_v = Bi_elliptic_transfer_elliptic_orbits(elem1, elem2, r_b);
+    ASSERT_NEAR(delta_v, 3.904057, 1e-6);
+
+}
+
+TEST(ORBITAL_MANEUVERS, INCLINATION_ONLY_TRANSFER) {
+    COE<double> elem1;
+    elem1.e = 0.3;
+    elem1.p = 17858.7836;
+    elem1.a = elem1.p / (1 - elem1.e * elem1.e);
+    elem1.i = 30 * M_PI / 180;
+    elem1.flag = 4;
+    elem1.w = 30 * M_PI / 180;
+    elem1.W = 45 * M_PI / 180;
+    elem1.mu = 398600.4415;
+
+    COE<double> elem2;
+    elem2.e = 0.3;
+    elem2.p = 17858.7836;
+    elem2.a = elem1.p / (1 - elem1.e * elem1.e);
+    elem2.i = 45 * M_PI / 180;
+    elem2.flag = 4;
+    elem2.w = 30 * M_PI / 180;
+    elem2.W = 45 * M_PI / 180;
+    elem2.mu = 398600.4415;
+    double delta_v = Inclination_only_transfer(elem1, elem2);
+    ASSERT_NEAR(delta_v, 0.912833, 1e-4);
+}
+
+TEST(ORBITAL_MANEUVERS, PLANE_CHANGE) {
+    COE<double> elem1;
+    elem1.e = 0.3;
+    elem1.p = 17858.7836;
+    elem1.a = elem1.p / (1 - elem1.e * elem1.e);
+    elem1.i = 30 * M_PI / 180;
+    elem1.flag = 4;
+    elem1.w = 30 * M_PI / 180;
+    elem1.W = 45 * M_PI / 180;
+    elem1.mu = 398600.4415;
+
+    COE<double> elem2;
+    elem2.e = 0.3;
+    elem2.p = 17858.7836;
+    elem2.a = elem1.p / (1 - elem1.e * elem1.e);
+    elem2.i = 15 * M_PI / 180;
+    elem2.flag = 4;
+    elem2.w = 30 * M_PI / 180;
+    elem2.W = 45 * M_PI / 180;
+    elem2.mu = 398600.4415;
+    auto[delta_v, r, v] = General_plane_change(elem1, elem2);
+    //ASSERT_NEAR(delta_v, 0.912833, 1e-4);
+
+    COE<double> check = RV2COE(r, v, elem1.mu);
+
+    //ASSERT_NEAR(check.i, elem2.i, 1e-1);
+    //ASSERT_NEAR(check.W, elem2.W, 1e-4);
+}
+
+
 
 int main(int argc, char **argv) {
     testing::InitGoogleTest(&argc, argv);
