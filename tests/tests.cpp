@@ -266,25 +266,25 @@ TEST(ORBITAL_MANEUVERS, PLANE_CHANGE) {
     elem1.i = 30 * M_PI / 180;
     elem1.flag = 4;
     elem1.w = 30 * M_PI / 180;
-    elem1.W = 45 * M_PI / 180;
+    elem1.W = 90 * M_PI / 180;
     elem1.mu = 398600.4415;
 
     COE<double> elem2;
     elem2.e = 0.3;
     elem2.p = 17858.7836;
     elem2.a = elem1.p / (1 - elem1.e * elem1.e);
-    elem2.i = 15 * M_PI / 180;
+    elem2.i = 175 * M_PI / 180;
     elem2.flag = 4;
     elem2.w = 30 * M_PI / 180;
-    elem2.W = 45 * M_PI / 180;
+    elem2.W = 90 * M_PI / 180;
     elem2.mu = 398600.4415;
     auto[delta_v, r, v] = General_plane_change(elem1, elem2);
     //ASSERT_NEAR(delta_v, 0.912833, 1e-4);
 
     COE<double> check = RV2COE(r, v, elem1.mu);
 
-    //ASSERT_NEAR(check.i, elem2.i, 1e-1);
-    //ASSERT_NEAR(check.W, elem2.W, 1e-4);
+    ASSERT_NEAR(check.i, elem2.i, 0.05);
+    ASSERT_NEAR(check.W, elem2.W, 1e-2);
 }
 
 

@@ -139,13 +139,11 @@ std::tuple<T, std::vector<T>, std::vector<T>> General_plane_change(COE<T> &initi
     std::cout << v11 << "\n";
     if (scalar(h1, h2) >= 1e-5) {
         v2_1 = v11 * cos(alpha) + h1 * norm(v11) * sin(alpha);
-        std::cout << v2_1 << "\n";
-        if (scalar(h2, v2_1) / norm(v2_1) > 1e-1) v2_1 = v11 * cos(alpha) - h1 * norm(v11) * sin(alpha);
-        std::cout << v2_1 << "\n";
     } else {
         v2_1 = v11 * (-cos(alpha)) + h1 * norm(v11) * sin(M_PI - alpha);
-        if (scalar(h2, v2_1) / norm(v2_1) > 1e-1) v2_1 = v11 * (-cos(alpha)) - h1 * norm(v11) * sin(M_PI - alpha);
+        //if (scalar(h2, v2_1) / norm(v2_1) > 1e-1) v2_1 = v11 * (-cos(alpha)) - h1 * norm(v11) * sin(M_PI - alpha);
     }
+    std::cout << v2_1 << "\n";
     std::cout << "v2=v1 " << norm(v2_1) / norm(v11) << "\n";
 
     // 2 node of intersecting planes
@@ -158,18 +156,20 @@ std::tuple<T, std::vector<T>, std::vector<T>> General_plane_change(COE<T> &initi
     delta_v2 = std::sqrt(2 * scalar(v12, v12) * (1 - cos(alpha)));
 
     if (scalar(h1, h2) >= 1e-30) {
-        v2_2 = v12 * cos(alpha) + h2 * norm(v12) * sin(alpha);
-        if (scalar(h2, v2_2) > 1e-30) v2_2 = v12 * cos(alpha) - h2 * norm(v12) * sin(alpha);
+        v2_2 = v12 * cos(alpha) - h1 * norm(v12) * sin(alpha);
+        //std::cout << "haha";
     } else {
         v2_2 = v12 * (-cos(alpha)) + h1 * norm(v12) * sin(M_PI - alpha);
-        if (scalar(h2, v2_2) > 1e-30) v2_2 = v12 * (-cos(alpha)) - h1 * norm(v12) * sin(M_PI - alpha);
+        //if (scalar(h2, v2_2) > 1e-30) v2_2 = v12 * (-cos(alpha)) - h1 * norm(v12) * sin(M_PI - alpha);
     }
-    std::cout << v12 << "\n";
+    //std::cout << "v2=v1 " << norm(v2_2) / norm(v12) << "\n";
     //std::cout << r11 << "\n" << r12 << "\n";
+    //std::cout << v12 << "\n" << v2_2 << "\n";
 
     std::cout << delta_v1 << " " << delta_v2 << "\n";
-    if (delta_v1 < delta_v2) return {delta_v1, r11, v2_1};
-    else return {delta_v2, r12, v2_2};
+//    if (delta_v1 < delta_v2) return {delta_v1, r11, v2_1};
+//    else return {delta_v2, r12, v2_2};
+    return {delta_v1, r11, v2_1};
 }
 
 
