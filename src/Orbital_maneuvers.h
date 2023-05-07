@@ -153,15 +153,6 @@ std::tuple<T, std::vector<T>, std::vector<T>> General_plane_change(COE<T> &initi
         v2_2 = v12 * (cos(alpha)) - h1 * norm(v12) * sin(M_PI - alpha);
     }
 
-    std::cout << norm(v11) / norm(v2_1) << "\n\n";
-    std::cout << v11 * cos(alpha) << "\n" << h1 * norm(v11) * sin(alpha) << "\n\n";
-    std::cout << scalar(v11, v2_1) / (norm(v11) * norm(v2_1)) << "\n" << cos(alpha) << "\n";
-
-    std::cout << v11 << "\n" << h1 << "\n\n";
-    std::cout << h2 << "\n\n";
-    std::cout << v2_1 << "\n" << v2_2 << "\n";
-
-    std::cout << delta_v1 << " " << delta_v2 << "\n";
     if (delta_v1 < delta_v2) return {delta_v1, r11, v2_1};
     else return {delta_v2, r12, v2_2};
 }
