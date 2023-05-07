@@ -18,29 +18,29 @@ Keplerian elements of initial and final orbits:
 Output: delta-v
 
 Orbital_elements_convertion.h
-1) RV2COE
+1) RV2COE:
 Function converts RV vectors to Keplerian elements
 
-2) COE2RV
+2) COE2RV:
 Function converts Keplerian elemnts to RV vectors
 
 Orbital_maneuvers.h
-1) Hohmann_transfer
+1) Hohmann_transfer:
 Hohmann algorithm to estimate delta-v
 
-2) Bi_elliptic_transfer_circular_orbits
+2) Bi_elliptic_transfer_circular_orbits:
 Bi-elliptic algorithm to estimate delta-v for circular orbits
 
-3) Bi_elliptic_transfer_elliptic_orbits
+3) Bi_elliptic_transfer_elliptic_orbits:
 Bi-elliptic transfer algorithm to estimate delta-v for elliptic orbits
 
-4) Two_impulse_transfer_elliptic_orbits
+4) Two_impulse_transfer_elliptic_orbits:
 Two impulse transfer algorithm to estimate delta-v for elliptic orbits
 
-5) Inclination_only_transfer
+5) Inclination_only_transfer:
 Inclination only plane change transfer algorithm to estimate delta-v
 
-6) General_plane_change
+6) General_plane_change:
 General plane change algorithm to estimate delta-v
 
 1.Finding planes intersection vectors
@@ -48,5 +48,5 @@ General plane change algorithm to estimate delta-v
 3.Considering, that V vector only changes its direction(without changing its magnitude), estimating delta-v by calculating angle between planes(difference between inclination angles)
 4.Returning delta-v and RV vectors in order to find transfer orbit, which plane coincide with final orbit's plane
 
-7) General_transfer
+7) General_transfer:
 Combining general plane change transfer with coplanar transfer
