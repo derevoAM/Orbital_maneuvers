@@ -21,10 +21,7 @@
     </configurations>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="3d718dc5-5473-45c4-a9ac-11fe0f35ed3c" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/src/Orbital_elements_convertion.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/Orbital_elements_convertion.h" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Orbital_maneuvers.h" beforeDir="false" afterPath="$PROJECT_DIR$/src/Orbital_maneuvers.h" afterDir="false" />
-    </list>
+    <list default="true" id="3d718dc5-5473-45c4-a9ac-11fe0f35ed3c" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -140,7 +137,7 @@
       <workItem from="1683220889140" duration="1859000" />
       <workItem from="1683316607854" duration="14195000" />
       <workItem from="1683366367842" duration="95000" />
-      <workItem from="1683404379001" duration="24794000" />
+      <workItem from="1683404379001" duration="25185000" />
     </task>
     <servers />
   </component>
