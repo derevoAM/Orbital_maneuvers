@@ -7,27 +7,53 @@
 #include "Dense.h"
 
 
+/**
+     * Structure of Keplerian elements
+     *
+     * @param:
+     * p - semilatus rectum
+     * a - semimajor axis
+     * e - eccentricity
+     * i - inclination
+     * W - right ascension (for inclined orbits)
+     * w - argument of perigee (for elliptic inclined orbits)
+     * nu - true anomaly (for now optional)
+     * u - argument of latitude (for circular inclined orbits)
+     * lam_true - true longitude (for circular equatorial orbits)
+     * w_true - true longitude of periapsis (for elliptic equatorial orbits)
+     * mu - gravitational parameter
+     * flag - determines type of orbit:1 - circular equatorial, 2 - circular inclined, 3 - elliptic equatorial, 4 - elliptic inclined
+     *
+     */
 template<typename T>
 struct COE {
     T p;
     T a;
     T e;
     T i;
-    T W; //Omega big
-    T w; //omega small
+    T W;
+    T w;
     T nu;
     T u;
     T lam_true;
     T w_true;
     T mu;
-    int flag = 0; // determine which type of orbit: 1 - cir eq, 2 - cir in, 3 - el eq, 4 - el in
+    int flag = 0;
 };
 
+/**
+     * Function that converts RV vectors to Keplerian elements
+     *
+     * If a Keplerian element is not defined for this type of orbit, it is assigned to 10
+     * @param: RV vectors
+     * @return Structure of Keplerian elements
+     *
+     */
 template<typename T>
 COE<T> RV2COE(const std::vector<T> &r, const std::vector<T> &v, T mu) {
-    std::vector<T> h = cross_product(r, v);
-    std::vector<T> n = cross_product(std::vector<T>{0, 0, 1}, h);
-    std::vector<T> e = (r * (scalar(v, v) - mu / norm(r)) - v * scalar(r, v)) / mu;
+    std::vector<T> h = cross_product(r, v); // angular momentum vector(vector perpendicular to orbit plane)
+    std::vector<T> n = cross_product(std::vector<T>{0, 0, 1}, h); // ascending node
+    std::vector<T> e = (r * (scalar(v, v) - mu / norm(r)) - v * scalar(r, v)) / mu; // eccentricity vector, which points to perigee
     T ksi = scalar(v, v) / 2 - mu / norm(r);
     T a = -mu / (2 * ksi);
     T p = scalar(h, h) / mu;
@@ -44,7 +70,6 @@ COE<T> RV2COE(const std::vector<T> &r, const std::vector<T> &v, T mu) {
             lam_true = r[0] / norm(r);
             if (r[1] < 0) lam_true = 2 * M_PI - lam_true;
 
-            // if degree parameter is equal 10, then it's not defined
             W = 10;
             w = 10;
             u = 10;
@@ -92,6 +117,14 @@ COE<T> RV2COE(const std::vector<T> &r, const std::vector<T> &v, T mu) {
     return COE<T>{p, a, norm(e), i, W, w, nu, u, lam_true, w_true, mu, flag};
 }
 
+/**
+     * Function that converts Keplerian elements to RV vectors
+     *
+     *
+     * @param: Keplerian elements
+     * @return RV vectors
+     *
+     */
 template<typename T>
 std::pair<std::vector<T>, std::vector<T>> COE2RV(const COE<T> &elem) {
     T w, W, nu, i = elem.i;
@@ -115,12 +148,12 @@ std::pair<std::vector<T>, std::vector<T>> COE2RV(const COE<T> &elem) {
         w = elem.w;
         W = elem.W;
     }
-    std::vector<T> r_pqw{elem.p * cos(nu) / (1 + elem.e * cos(nu)), elem.p * sin(nu) / (1 + elem.e * cos(nu)), 0};
-    std::vector<T> v_pqw{-std::sqrt(elem.mu / elem.p) * sin(nu), std::sqrt(elem.mu / elem.p) * (elem.e + cos(nu)), 0};
+    std::vector<T> r_pqw{elem.p * cos(nu) / (1 + elem.e * cos(nu)), elem.p * sin(nu) / (1 + elem.e * cos(nu)), 0}; // calculating R vector in perifocal coordinate system
+    std::vector<T> v_pqw{-std::sqrt(elem.mu / elem.p) * sin(nu), std::sqrt(elem.mu / elem.p) * (elem.e + cos(nu)), 0};// calculating V vector in perifocal coordinate system
     Dense<T> A(3, 3, {cos(W) * cos(w) - sin(W) * sin(w) * cos(i), -cos(W) * sin(w) - sin(W) * cos(w) * cos(i), sin(W) * sin(i),
                       sin(W) * cos(w) + cos(W) * sin(w) * cos(i), -sin(W) * sin(w) + cos(W) * cos(w) * cos(i), -cos(W) * sin(i),
-                      sin(w) * sin(i),                             cos(w) * sin(i),                             cos(i)});
-    //std::cout << r_pqw << "\n";
+                      sin(w) * sin(i),                             cos(w) * sin(i),                             cos(i)}); // matrix of coordinate transformations
+
     return std::pair(A * r_pqw, A * v_pqw);
 }
 

@@ -3,6 +3,13 @@
 
 #include "Orbital_elements_convertion.h"
 
+/**
+     * Hohmann transfer
+     *
+     * @param: Keplerian elements of initial and final orbits
+     * @return delta-v
+     *
+     */
 template<typename T>
 T Hohmann_transfer(const COE<T> &initial, const COE<T> &final) {
     T mu = initial.mu;
@@ -13,9 +20,15 @@ T Hohmann_transfer(const COE<T> &initial, const COE<T> &final) {
     T v_trans2 = std::sqrt(2 * mu / final.a - mu / a_trans);
     T delta_v = abs(v_trans1 - v_in) + abs(v_fin - v_trans2);
     return delta_v;
-
 }
 
+/**
+     * Bi-elliptical transfer for circular orbits
+     *
+     * @param: Keplerian elements of initial and final orbits, apogee radius of transfer orbit
+     * @return delta-v
+     *
+     */
 template<typename T>
 T Bi_elliptic_transfer_circular_orbits(const COE<T> &initial, const COE<T> &final, T r_b) {
     T mu = initial.mu;
@@ -27,13 +40,18 @@ T Bi_elliptic_transfer_circular_orbits(const COE<T> &initial, const COE<T> &fina
     T v_trans1b = std::sqrt(2 * mu / r_b - mu / a_trans1);
     T v_trans2b = std::sqrt(2 * mu / r_b - mu / a_trans2);
     T v_trans2c = std::sqrt(2 * mu / final.a - mu / a_trans2);
-
-
     T delta_v = abs(v_trans1a - v_in) + abs(v_trans2b - v_trans1b) + abs(v_fin - v_trans2c);
     return delta_v;
 
 }
 
+/**
+     * Bi-elliptic transfer for elliptical orbits
+     *
+     * @param: Keplerian elements of initial and final orbits, apogee radius of transfer orbit
+     * @return delta-v
+     *
+     */
 template<typename T>
 T Bi_elliptic_transfer_elliptic_orbits(const COE<T> &initial, const COE<T> &final, T r_a) {
     auto [r1, v1] = COE2RV(initial);
@@ -59,11 +77,17 @@ T Bi_elliptic_transfer_elliptic_orbits(const COE<T> &initial, const COE<T> &fina
 
     T delta_v = v1h + v2h - std::sqrt(v0r * v0r + (v0t + v1ha) * (v0t + v1ha)) -
                 std::sqrt(v3r * v3r + (v3t - v2ha) * (v3t - v2ha));
-    //std::cout << v3r << " " << v3t << "\n";
     return delta_v;
 
 }
 
+/**
+     * Two impulse transfer for elliptical orbits
+     *
+     * @param: Keplerian elements of initial and final orbits
+     * @return delta-v
+     *
+     */
 template<typename T>
 T Two_impulse_transfer_elliptic_orbits(const COE<T> &initial, const COE<T> &final) {
     auto [r1, v1] = COE2RV(initial);
@@ -79,12 +103,18 @@ T Two_impulse_transfer_elliptic_orbits(const COE<T> &initial, const COE<T> &fina
 
     T v3r = scalar(v2, r2) / norm(r2);
     T v3t = std::sqrt(scalar(v2, v2) - v3r * v3r);
-    //std::cout << v3r << " " << v3t << " " << norm(r2) << "\n";
 
     T delta_v = std::sqrt(v3r * v3r + (v3t + v1ht) * (v3t + v1ht)) - std::sqrt(v0r * v0r + (v0t + v2ht) * (v0t + v2ht));
     return delta_v;
 }
 
+/**
+     * Inclination only plane change transfer for elliptical orbits
+     *
+     * @param: Keplerian elements of initial and final orbits
+     * @return delta-v
+     *
+     */
 template<typename T>
 T Inclination_only_transfer(const COE<T> &initial, const COE<T> &final) {
     T r1 = initial.p / (1 + initial.e * cos(2 * M_PI - initial.w));
@@ -101,6 +131,13 @@ T Inclination_only_transfer(const COE<T> &initial, const COE<T> &final) {
     return std::min(delta_v1, delta_v2);
 }
 
+/**
+     * General plane change transfer for elliptical orbits
+     *
+     * @param: Keplerian elements of initial and final orbits
+     * @return delta-v, RV vectors
+     *
+     */
 template<typename T>
 std::tuple<T, std::vector<T>, std::vector<T>> General_plane_change(COE<T> &initial, const COE<T> &final) {
     auto [r_i, v_i] = COE2RV(initial);
@@ -158,4 +195,21 @@ std::tuple<T, std::vector<T>, std::vector<T>> General_plane_change(COE<T> &initi
 }
 
 
+/**
+     * General non-coplanar transfer
+     *
+     * @param: Keplerian elements of initial and final orbits
+     * @return delta-v
+     *
+     */
+template<typename T>
+T General_transfer(COE<T> &initial, COE<T> &final)
+{
+    auto[delta_v1, r, v] = General_plane_change(initial, final);
+    COE<T> transfer = RV2COE(r, v);
+    transfer.nu = 0;
+    final.nu = M_PI;
+    T delta_v2 = Two_impulse_transfer_elliptic_orbits(transfer, final);
+    return delta_v1 + delta_v1;
+}
 #endif //ORBITAL_MANEUVERS_ORBITAL_MANEUVERS_H
