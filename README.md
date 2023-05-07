@@ -43,10 +43,10 @@ Inclination only plane change transfer algorithm to estimate delta-v
 6) General_plane_change:
 General plane change algorithm to estimate delta-v
 
-1.Finding planes intersection vectors
-2.Finding 2 points, that belongs to initial orbit and final plane
-3.Considering, that V vector only changes its direction(without changing its magnitude), estimating delta-v by calculating angle between planes(difference between inclination angles)
-4.Returning delta-v and RV vectors in order to find transfer orbit, which plane coincide with final orbit's plane
+* Finding planes intersection vectors
+* Finding 2 points, that belongs to initial orbit and final plane
+* Considering, that V vector only changes its direction(without changing its magnitude), estimating delta-v by calculating angle between planes(difference between inclination angles)
+* Returning delta-v and RV vectors in order to find transfer orbit, which plane coincide with final orbit's plane
 
 7) General_transfer:
 Combining general plane change transfer with coplanar transfer
