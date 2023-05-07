@@ -17,6 +17,10 @@ Keplerian elements of initial and final orbits:
 
 Output: delta-v
 
+Linear dimensions are measured in km
+Angles are measured in radians
+Velocity is measured in km/s
+
 Orbital_elements_convertion.h
 1) RV2COE:
    Function converts RV vectors to Keplerian elements
@@ -50,3 +54,9 @@ Orbital_maneuvers.h
 
 7) General_transfer:
    Combining general plane change transfer with coplanar transfer
+
+References:
+1. D.A. Vallado, Fundamentals of Astrodynamics and Applications
+2. https://www.researchgate.net/publication/318454562_Optimal_Bi-elliptic_transfer_between_two_generic_coplanar_elliptical_orbits
+3. https://www.researchgate.net/publication/262950172_Analytical_Solution_of_Two-Impulse_Transfer_Between_Coplanar_Elliptical_Orbits
+4. https://cyberleninka.ru/article/n/optimalnyy-biellipticheskiy-perehod-mezhdukamplanarnymi-ellipticheskimi-orbitami
