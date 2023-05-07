@@ -35,7 +35,7 @@ COE<T> RV2COE(const std::vector<T> &r, const std::vector<T> &v, T mu) {
     T w_true, W, w, lam_true, u, nu;
     int flag = 0;
 
-    if (norm(e) < 1e-4) { // circular case
+    if (norm(e) < 1e-1) { // circular case
         nu = acos(
                 r[0] / norm(r)); // let's consider, that in circular case true anomaly is the angle between I axis and r
         if (scalar(r, v) < 0) nu = 2 * M_PI - nu;
@@ -66,9 +66,9 @@ COE<T> RV2COE(const std::vector<T> &r, const std::vector<T> &v, T mu) {
     {
         nu = acos(scalar(e, r) / (norm(e) * norm(r)));
         if (scalar(r, v) < 0) nu = 2 * M_PI - nu;
-        if (norm(n) == 0) // elliptic equatorial case
+        if (norm(n) <= 1e-4) // elliptic equatorial case
         {
-            w_true = e[0] / norm(e);
+            w_true = acos(e[0] / norm(e));
             if (e[1] < 0) w_true = 2 * M_PI - w_true;
             W = 10;
             w = 10;

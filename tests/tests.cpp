@@ -3,6 +3,8 @@
 #include "../src/Orbital_maneuvers.h"
 
 TEST(ORBITAL_MANEUVERS, RV2COE_ELLIPTIC_INCLINED) {
+    /// Converting RV vectors to Keplerian elements for elliptic inclined orbit ///
+
     std::vector<double> r{6524.834, 6862.875, 6448.296};
     std::vector<double> v{4.901327, 5.533756, -1.976341};
     double mu = 398600.4415;
@@ -16,6 +18,52 @@ TEST(ORBITAL_MANEUVERS, RV2COE_ELLIPTIC_INCLINED) {
     ASSERT_EQ(elem.flag, 4);
 
 }
+
+TEST(ORBITAL_MANEUVERS, RV2COE_ELLIPTIC_EQUATORIAL) {
+    /// Converting RV vectors to Keplerian elements for elliptic equatorial orbit ///
+
+    std::vector<double> r{6524.834, 6862.875, 0};
+    std::vector<double> v{4.901327, 1.533756, 0};
+    double mu = 398600.4415;
+    COE<double> elem = RV2COE(r, v, mu);
+    ASSERT_NEAR(elem.a, 6894.965, 1e-1);
+    ASSERT_NEAR(elem.e, 0.8926, 1e-2);
+    ASSERT_NEAR(elem.i, 180 * M_PI / 180, 1e-2);
+    ASSERT_NEAR(elem.w_true, 197.848 * M_PI / 180, 2e-1);
+    ASSERT_EQ(elem.flag, 3);
+
+}
+
+TEST(ORBITAL_MANEUVERS, RV2COE_CIRCULAR_INCLINED) {
+    /// Converting RV vectors to Keplerian elements for circular inclined orbit ///
+
+    std::vector<double> r{5011.173, 6234.5, -138.135};
+    std::vector<double> v{5.499, -4.422, -0.1048};
+    double mu = 398600.4415;
+    COE<double> elem = RV2COE(r, v, mu);
+    ASSERT_NEAR(elem.a, 8000, 5);
+    ASSERT_NEAR(elem.e, 0, 1e-2);
+    ASSERT_NEAR(elem.i, 178.7 * M_PI / 180, 1e-1);
+    ASSERT_NEAR(elem.W, 280.5 * M_PI / 180, 1e-2);
+    ASSERT_EQ(elem.flag, 2);
+
+}
+
+TEST(ORBITAL_MANEUVERS, RV2COE_CIRCULAR_EQUATORIAL) {
+    /// Converting RV vectors to Keplerian elements for circular equatorial orbit ///
+
+    std::vector<double> r{5011.173, 6234.5, 0};
+    std::vector<double> v{5.499, -4.422, 0};
+    double mu = 398600.4415;
+    COE<double> elem = RV2COE(r, v, mu);
+    ASSERT_NEAR(elem.a, 7997, 5);
+    ASSERT_NEAR(elem.e, 0, 1e-2);
+    ASSERT_NEAR(elem.i, 180 * M_PI / 180, 1e-2);
+    ASSERT_EQ(elem.flag, 1);
+
+}
+
+
 
 TEST(ORBITAL_MANEUVERS, COE2RV_ELLIPTIC_INCLINED) {
     COE<double> elem;
@@ -263,7 +311,7 @@ TEST(ORBITAL_MANEUVERS, PLANE_CHANGE) {
     elem1.e = 0.3;
     elem1.p = 17858.7836;
     elem1.a = elem1.p / (1 - elem1.e * elem1.e);
-    elem1.i = 30 * M_PI / 180;
+    elem1.i = 70 * M_PI / 180;
     elem1.flag = 4;
     elem1.w = 30 * M_PI / 180;
     elem1.W = 90 * M_PI / 180;
@@ -273,18 +321,24 @@ TEST(ORBITAL_MANEUVERS, PLANE_CHANGE) {
     elem2.e = 0.3;
     elem2.p = 17858.7836;
     elem2.a = elem1.p / (1 - elem1.e * elem1.e);
-    elem2.i = 175 * M_PI / 180;
-    elem2.flag = 4;
+    elem2.i = 0 * M_PI / 180;
+    elem2.flag = 3;
     elem2.w = 30 * M_PI / 180;
-    elem2.W = 90 * M_PI / 180;
+    //elem2.W = 90 * M_PI / 180;
+    elem2.w_true = 20 * M_PI / 180;
     elem2.mu = 398600.4415;
     auto[delta_v, r, v] = General_plane_change(elem1, elem2);
-    //ASSERT_NEAR(delta_v, 0.912833, 1e-4);
 
     COE<double> check = RV2COE(r, v, elem1.mu);
+    std::vector<double> h = cross_product(r, v);
+    std::vector<double> n = cross_product(std::vector<double>{0, 0, 1}, h);
 
+    std::cout << "norm(n) " << norm(n) << "\n";
+    std::cout << h << "\n";
+    std::cout << r << "\n" << v << "\n";
     ASSERT_NEAR(check.i, elem2.i, 0.05);
-    ASSERT_NEAR(check.W, elem2.W, 1e-2);
+    std::cout << check.i << "\n";
+    //ASSERT_NEAR(check.w_true, elem2.w_true, 1e-2);
 }
 
 

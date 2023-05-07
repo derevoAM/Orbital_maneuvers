@@ -117,16 +117,13 @@ std::tuple<T, std::vector<T>, std::vector<T>> General_plane_change(COE<T> &initi
 
     std::vector<T> a = cross_product(h1, h2); // vector of plane intersection
     a = a / norm(a);
-    std::cout << "a= " << a << "\n";
 
     std::vector<T> e = (r_i * (scalar(v_i, v_i) - mu / norm(r_i)) - v_i * scalar(r_i, v_i)) / mu;
-    //std::cout << e << "\n";
 
 
     T nu = acos(scalar(e, a) / (norm(e) * norm(a)));
     if (scalar(a, v_i) < 0) nu = 2 * M_PI - nu;
 
-    std::cout << "nu = " << nu * 180 / M_PI << "\n";
 
     initial.nu = nu;
     std::vector<T> v2_1, v2_2; //two vectors for 2 nodes
@@ -136,40 +133,37 @@ std::tuple<T, std::vector<T>, std::vector<T>> General_plane_change(COE<T> &initi
     T alpha = acos(scalar(h1, h2));
     delta_v1 = std::sqrt(2 * scalar(v11, v11) * (1 - cos(alpha)));
 
-    std::cout << v11 << "\n";
     if (scalar(h1, h2) >= 1e-5) {
         v2_1 = v11 * cos(alpha) + h1 * norm(v11) * sin(alpha);
     } else {
-        v2_1 = v11 * (-cos(alpha)) + h1 * norm(v11) * sin(M_PI - alpha);
-        //if (scalar(h2, v2_1) / norm(v2_1) > 1e-1) v2_1 = v11 * (-cos(alpha)) - h1 * norm(v11) * sin(M_PI - alpha);
+        v2_1 = v11 * (cos(alpha)) + h1 * norm(v11) * sin(M_PI - alpha);
     }
-    std::cout << v2_1 << "\n";
-    std::cout << "v2=v1 " << norm(v2_1) / norm(v11) << "\n";
 
     // 2 node of intersecting planes
     if (nu < M_PI) initial.nu = nu + M_PI;
     else initial.nu = nu - M_PI;
 
-    std::cout << "nu = " << initial.nu * 180 / M_PI << "\n";
 
     auto [r12, v12] = COE2RV(initial);
     delta_v2 = std::sqrt(2 * scalar(v12, v12) * (1 - cos(alpha)));
 
     if (scalar(h1, h2) >= 1e-30) {
         v2_2 = v12 * cos(alpha) - h1 * norm(v12) * sin(alpha);
-        //std::cout << "haha";
     } else {
-        v2_2 = v12 * (-cos(alpha)) + h1 * norm(v12) * sin(M_PI - alpha);
-        //if (scalar(h2, v2_2) > 1e-30) v2_2 = v12 * (-cos(alpha)) - h1 * norm(v12) * sin(M_PI - alpha);
+        v2_2 = v12 * (cos(alpha)) - h1 * norm(v12) * sin(M_PI - alpha);
     }
-    //std::cout << "v2=v1 " << norm(v2_2) / norm(v12) << "\n";
-    //std::cout << r11 << "\n" << r12 << "\n";
-    //std::cout << v12 << "\n" << v2_2 << "\n";
+
+    std::cout << norm(v11) / norm(v2_1) << "\n\n";
+    std::cout << v11 * cos(alpha) << "\n" << h1 * norm(v11) * sin(alpha) << "\n\n";
+    std::cout << scalar(v11, v2_1) / (norm(v11) * norm(v2_1)) << "\n" << cos(alpha) << "\n";
+
+    std::cout << v11 << "\n" << h1 << "\n\n";
+    std::cout << h2 << "\n\n";
+    std::cout << v2_1 << "\n" << v2_2 << "\n";
 
     std::cout << delta_v1 << " " << delta_v2 << "\n";
-//    if (delta_v1 < delta_v2) return {delta_v1, r11, v2_1};
-//    else return {delta_v2, r12, v2_2};
-    return {delta_v1, r11, v2_1};
+    if (delta_v1 < delta_v2) return {delta_v1, r11, v2_1};
+    else return {delta_v2, r12, v2_2};
 }
 
 
